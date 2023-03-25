@@ -1,0 +1,20 @@
+go mod init ChatGPT_Discord_Bot
+get github.com/bwmarrin/discordgo
+
+
+	//err = discord.UpdateStatusComplex(discordgo.UpdateStatusData{
+	//	Status: "online",
+	//})
+	//if err != nil {
+	//	fmt.Println("Error updating status,", err)
+	//	return
+	//}
+	//_, err = discord.ChannelMessageSend("820030044847079506", "Hello from my bot!")
+	//if err != nil {
+	//	fmt.Println("Sending messege to discord chat. Error sending message,", err)
+	//	return
+	//}
+
+		t := time.Now().UTC()
+	fmt.Println(t.Format("15:04:05"))
+	fmt.Println(t.Format("20060102150405"))
