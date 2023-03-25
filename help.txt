@@ -1,5 +1,7 @@
 go mod init ChatGPT_Discord_Bot
-get github.com/bwmarrin/discordgo
+gо get github.com/bwmarrin/discordgo
+go build .
+go run .
 
 
 	//err = discord.UpdateStatusComplex(discordgo.UpdateStatusData{
