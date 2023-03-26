@@ -4,6 +4,7 @@ import (
 	"ChatGPT_Discord_Bot/gpt"
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -19,10 +20,40 @@ func main() {
 	}
 	chat_gpt := gpt.NewGPTConnection(api_key)
 	reader := bufio.NewReader(os.Stdin)
-	for {
-		fmt.Print("-> ")
-		text, _ := reader.ReadString('\n')
-		text = strings.Replace(text, "\n", "", -1)
-		chat_gpt.ToGPT(text)
+	fmt.Print("\n")
+	fmt.Print("-> ")
+	fmt.Print("\n")
+	text, _ := reader.ReadString('\n')
+	text = strings.Replace(text, "\n", "", -1)
+	//chat_gpt.ToGPT(text)
+
+
+
+	outCh := make(chan string)
+	errCh := make(chan error)
+	go func() {
+		_, err := chat_gpt.ToGPT(text)
+		outCh <- "sdf"
+		errCh <- err
+		close(outCh)
+		close(errCh)
+	}()
+	err := <-errCh
+	if err != nil{
+		log.Panic(err)
+		
+	} else {
+		out := <-outCh
+		fmt.Println(out)
+		return
 	}
+		
+	
+	//for {
+	//	fmt.Print("\n")
+	//	fmt.Print("-> ")
+	//	text, _ := reader.ReadString('\n')
+	//	text = strings.Replace(text, "\n", "", -1)
+	//	chat_gpt.ToGPT(text)
+	//}
 }

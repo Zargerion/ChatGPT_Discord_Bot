@@ -61,7 +61,7 @@ func (gpt *igpt) ToGPT(text string) (string, error) {
 		Model:        		"gpt-3.5-turbo",
 		Messages:     		messages,
 		Temperature:  		gpt3.Float32Ptr(0.9),
-		MaxTokens:    		180,
+		MaxTokens:    		300,
 		TopP:         		1,
 		PresencePenalty:    0.0,
 		FrequencyPenalty:   0.6,
@@ -78,7 +78,8 @@ func (gpt *igpt) ToGPT(text string) (string, error) {
 		ans = resp.Choices[0].Delta.Content
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln("Error to request.", err)
+		return "Error to request.", err
 	}
 
 	messages = append(messages, gpt3.ChatCompletionRequestMessage {
