@@ -3,6 +3,9 @@ gо get github.com/bwmarrin/discordgo
 go build .
 go run .
 
+git reset <hash of commit>
+git push --force origin master
+
 
 	//err = discord.UpdateStatusComplex(discordgo.UpdateStatusData{
 	//	Status: "online",
