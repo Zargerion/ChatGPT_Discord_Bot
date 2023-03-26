@@ -25,7 +25,13 @@ func main() {
 
 	) 
 	if token == ""{
-		panic("Missing DISCORD_TOKEN")
+		viper.AutomaticEnv()
+		err := viper.BindEnv("GDISCORD_TOKEN", "DISCORD_TOKEN")
+		if err != nil {
+			fmt.Println("Missing api key for discord.")
+			return
+		}
+		token = viper.GetString("DISCORD_TOKEN")	
 	}
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {

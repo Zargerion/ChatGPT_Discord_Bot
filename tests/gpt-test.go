@@ -16,7 +16,13 @@ func main() {
 	viper.ReadInConfig()
 	api_key := viper.GetString("GPT_API_KEY")
 	if api_key == "" {
-		panic("Missing GPT_API_KEY.")
+		viper.AutomaticEnv()
+		err := viper.BindEnv("GPT_API_KEY", "GPT_API_KEY")
+		if err != nil {
+			fmt.Println("Missing api key for discord.")
+			return
+		}
+		api_key = viper.GetString("GPT_API_KEY")	
 	}
 	chat_gpt := gpt.NewGPTConnection(api_key)
 	reader := bufio.NewReader(os.Stdin)
