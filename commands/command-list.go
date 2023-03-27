@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
@@ -38,7 +39,7 @@ var (
 )
 
 func InitComandList(s *discordgo.Session) {
-	log.Println("Adding commands...")
+	fmt.Println("Adding commands...")
 	registeredCommands = make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate("1088457644706103296", "", v)
@@ -50,7 +51,7 @@ func InitComandList(s *discordgo.Session) {
 }
 
 func DeleteComandList(s *discordgo.Session)  {
-	log.Println("Deleting commands...")
+	fmt.Println("Deleting commands...")
 	for _, v := range registeredCommands {
 		err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
 		if err != nil {

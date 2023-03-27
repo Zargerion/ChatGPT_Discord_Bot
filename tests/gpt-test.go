@@ -1,10 +1,9 @@
 package main
 
 import (
-	"ChatGPT_Discord_Bot/gpt"
+	"ChatGPT_Discord_Bot/gpt/interfaceGPT"
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -24,42 +23,30 @@ func main() {
 		}
 		api_key = viper.GetString("GPT_API_KEY")	
 	}
-	chat_gpt := gpt.NewGPTConnection(api_key)
+	chat_gpt := interfaceGPT.NewGPT(api_key)
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("\n")
-	fmt.Print("-> ")
-	fmt.Print("\n")
-	text, _ := reader.ReadString('\n')
-	text = strings.Replace(text, "\n", "", -1)
-	//chat_gpt.ToGPT(text)
-
-
-
-	outCh := make(chan string)
-	errCh := make(chan error)
-	go func() {
-		_, err := chat_gpt.ToGPT(text)
-		outCh <- "sdf"
-		errCh <- err
-		close(outCh)
-		close(errCh)
-	}()
-	err := <-errCh
-	if err != nil{
-		log.Panic(err)
-		
-	} else {
-		out := <-outCh
-		fmt.Println(out)
-		return
+	signal := false
+	var count int8 = 0
+	for {
+		fmt.Print("\n")
+		fmt.Print("-> ")
+		fmt.Print("\n")
+		text, _ := reader.ReadString('\n')
+		text = strings.Replace(text, "\n", "", -1)
+		helpCh := make(chan string)
+		count++
+		if count == 2 {
+			signal = true
+		}
+		go func() {
+			str, err := chat_gpt.ToGPT(text, signal)
+			if err != nil{
+				fmt.Println("Out fail.")
+				return
+			} else {
+				helpCh <- str
+			}
+		}() 
+		fmt.Print(<-helpCh)
 	}
-		
-	
-	//for {
-	//	fmt.Print("\n")
-	//	fmt.Print("-> ")
-	//	text, _ := reader.ReadString('\n')
-	//	text = strings.Replace(text, "\n", "", -1)
-	//	chat_gpt.ToGPT(text)
-	//}
 }

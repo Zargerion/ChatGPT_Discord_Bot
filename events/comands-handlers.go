@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"ChatGPT_Discord_Bot/gpt"
 	"ChatGPT_Discord_Bot/utils"
 
 	"github.com/bwmarrin/discordgo"
@@ -11,6 +12,8 @@ import (
 
 var (
 	GottenInfo string
+	NumOfCallText int8 = 0
+	storyCleared string = ""
 	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			id_message := i.Interaction.ID
@@ -48,30 +51,34 @@ var (
 				msgformat += "%s"
 			}
 
-			_, err := fmt.Println(fmt.Sprintf(
+			message := fmt.Sprintf(
 				msgformat,
 				margs...,
-			))
-			if err != nil {
-				fmt.Println("Error: fmt.Println(msgformat).")
-			}
+			)
 
+			NumOfCallText++
+			if NumOfCallText == 19 {
+				storyCleared = "Your message history has reached the limit. After this answer it will be cleared. "
+			}
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Got it! You sent: " + fmt.Sprintf(
-						msgformat,
-						margs...,
-					),
+					Content: `Got it! You sent: "` + message + `" ` + storyCleared + "Wait for answer...", 
 				},
 			})
+
+			go gpt.SendToGPTForAnswer(&message, s, i, NumOfCallText)
+
+			if NumOfCallText == 19 {
+				NumOfCallText = 0
+			}
 		},
 		"image": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Got it, but now it's unavalable. We are needs GPT Plus...",
+					Content: "Got it, but now it's unavalable. We needs GPT Plus..." + " <@" + i.Member.User.ID + ">",
 				},
 			})
 		},

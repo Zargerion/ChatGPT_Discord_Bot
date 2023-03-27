@@ -1,4 +1,4 @@
-package gpt
+package interfaceGPT
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 type IGPT interface {
-	ToGPT(text string) (string, error)
+	ToGPT(text string, clearSignal bool) (string, error)
 }
 
 type igpt struct {
@@ -17,7 +17,7 @@ type igpt struct {
 	ctx      *context.Context
 }
 
-func NewGPTConnection(apiKey string) IGPT {
+func NewGPT(apiKey string) IGPT {
 
 	ctx := context.Background()
 	client := gpt3.NewClient(apiKey)
@@ -36,17 +36,17 @@ func NewGPTConnection(apiKey string) IGPT {
 		Echo:      true,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Cannot make client OpenAI. ", err)
 	} else {
-		fmt.Print("Gpt is running.")
+		fmt.Print("Gpt client session is started. \n")
 	}
 
 	return gpt
 }
-
+ 
 var messages = make([]gpt3.ChatCompletionRequestMessage, 0)
 
-func (gpt *igpt) ToGPT(text string) (string, error) {
+func (gpt *igpt) ToGPT(text string, clearSignal bool) (string, error) {
 
 	c := *gpt.gptClint
 	ctx := *gpt.ctx
@@ -71,22 +71,26 @@ func (gpt *igpt) ToGPT(text string) (string, error) {
 		Stream:             false,
 	}
 
-	ans := ""
+	out := new(string)
 
-	err := c.ChatCompletionStream(ctx, request, func(resp *gpt3.ChatCompletionStreamResponse){
-		fmt.Print(resp.Choices[0].Delta.Content)
-		ans = resp.Choices[0].Delta.Content
+	err := c.ChatCompletionStream(ctx, request, func(resp *gpt3.ChatCompletionStreamResponse) {
+		*out += resp.Choices[0].Delta.Content
 	})
 	if err != nil {
 		log.Panicln("Error to request.", err)
 		return "Error to request.", err
 	}
+	ans := *out
 
 	messages = append(messages, gpt3.ChatCompletionRequestMessage {
 	
 		Role:    "user",
 		Content: ans,	
 	})
+
+	if clearSignal {
+		messages = make([]gpt3.ChatCompletionRequestMessage, 0)
+	}
 
 	return ans, err
 }
