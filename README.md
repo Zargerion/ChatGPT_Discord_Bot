@@ -13,15 +13,18 @@ Make a directory. In this directory using console write:
 
 ## Using
 
-Come here to make an application for your discord server and get DISCORD_TOKEN: ```https://discord.com/developers/applications```
+Come here to make an application for your discord server and get DISCORD_TOKEN: 
+```https://discord.com/developers/applications```
 
-Come here to get a GPT_API_KEY: ```https://platform.openai.com/account/api-keys```
+Come here to get a GPT_API_KEY: 
+```https://platform.openai.com/account/api-keys```
 
 Next you need go compiler. If you haven't, google how to get (https://go.dev/dl/). 
 
 Use an IDE to change DISCORD_TOKEN and GPT_API_KEY in .env files. 
 
-Run it in root using command in terminal: ```go run main.go```
+Run it in root using command in terminal: 
+```go run main.go```
 
 Or you can compile it for .exe file to execute.
 
