@@ -16,15 +16,29 @@ var (
 			DefaultPermission: &defaultPermission,
 		},
 		{
-			Name: "text",
-			Description: "To write and get text.",
+			Name: "chat",
+			Description: "To write and get text answer.",
 			DefaultPermission: &defaultPermission,
 			Options: []*discordgo.ApplicationCommandOption{
 
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "message",
-					Description: "Write",
+					Description: "Write to get answer.",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name: "translate",
+			Description: "To write and get text that translated to english.",
+			DefaultPermission: &defaultPermission,
+			Options: []*discordgo.ApplicationCommandOption{
+
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "message",
+					Description: "Write for translating.",
 					Required:    true,
 				},
 			},

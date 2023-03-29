@@ -9,7 +9,9 @@ import (
 )
 
 type IGPT interface {
-	ToGPT(text string, clearSignal bool) (string, error)
+	ToGPTWithHistoryChat(text string, clearSignal bool) (string, error)
+	ToGPTWithoutHistoryTranslate(text string) (string, error)
+	ToGPTWithoutHistoryGrammarCorrect(text string) (string, error)
 }
 
 type igpt struct {
@@ -46,7 +48,7 @@ func NewGPT(apiKey string) IGPT {
  
 var messages = make([]gpt3.ChatCompletionRequestMessage, 0)
 
-func (gpt *igpt) ToGPT(text string, clearSignal bool) (string, error) {
+func (gpt *igpt) ToGPTWithHistoryChat(text string, clearSignal bool) (string, error) {
 
 	c := *gpt.gptClint
 	ctx := *gpt.ctx
@@ -90,7 +92,66 @@ func (gpt *igpt) ToGPT(text string, clearSignal bool) (string, error) {
 
 	if clearSignal {
 		messages = make([]gpt3.ChatCompletionRequestMessage, 0)
+		fmt.Println("Chat messages is cleared.")
 	}
+
+	return ans, err
+}
+
+func (gpt *igpt) ToGPTWithoutHistoryTranslate(text string) (string, error) {
+
+	c := *gpt.gptClint
+	ctx := *gpt.ctx
+
+	message := []string {
+		"Translate this into English:\n" + text,	
+	}
+
+	request := gpt3.CompletionRequest{
+		Prompt:     		message,
+		Temperature:  		gpt3.Float32Ptr(0.3),
+		MaxTokens:    		gpt3.IntPtr(300),
+		TopP:         		gpt3.Float32Ptr(1),
+		PresencePenalty:    0.0,
+		FrequencyPenalty:   0.0,
+		Stream:             false,
+	}
+
+	out, err := c.CompletionWithEngine(ctx, "text-davinci-003", request)
+	if err != nil {
+		log.Panicln("Error to request.", err)
+		return "Error to request.", err
+	}
+	ans := out.Choices[0].Text
+
+	return ans, err
+}
+
+func (gpt *igpt) ToGPTWithoutHistoryGrammarCorrect(text string) (string, error) {
+
+	c := *gpt.gptClint
+	ctx := *gpt.ctx
+
+	message := []string {
+		"Correct this to standard English:\n" + text,	
+	}
+
+	request := gpt3.CompletionRequest{
+		Prompt:     		message,
+		Temperature:  		gpt3.Float32Ptr(0),
+		MaxTokens:    		gpt3.IntPtr(300),
+		TopP:         		gpt3.Float32Ptr(1),
+		PresencePenalty:    0.0,
+		FrequencyPenalty:   0.0,
+		Stream:             false,
+	}
+
+	out, err := c.CompletionWithEngine(ctx, "text-davinci-003", request)
+	if err != nil {
+		log.Panicln("Error to request.", err)
+		return "Error to request.", err
+	}
+	ans := out.Choices[0].Text
 
 	return ans, err
 }

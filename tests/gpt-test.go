@@ -39,7 +39,7 @@ func main() {
 			signal = true
 		}
 		go func() {
-			str, err := chat_gpt.ToGPT(text, signal)
+			str, err := chat_gpt.ToGPTWithHistoryChat(text, signal)
 			if err != nil{
 				fmt.Println("Out fail.")
 				return

@@ -44,8 +44,18 @@ func main() {
 	discord.AddHandler(events.MessageCreate)
 	commands.InitComandList(discord)
 	discord.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := events.CommandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
+		switch i.Type {
+		case discordgo.InteractionApplicationCommand:
+
+			if h, ok := events.CommandHandlers[i.ApplicationCommandData().Name]; ok {
+				h(s, i)
+			}
+
+		case discordgo.InteractionMessageComponent:
+			
+			if h, ok := events.ComponentsHandlers[i.MessageComponentData().CustomID]; ok {
+				h(s, i)
+			}
 		}
 	})
 

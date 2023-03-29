@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	GottenInfo string
-	NumOfCallText int8 = 0
-	storyCleared string = ""
-	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	GottenInfo      string
+	NumOfCallText   int8   = 0
+	storyCleared    string = ""
+	CommandHandlers        = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			id_message := i.Interaction.ID
 			timestamp, err := discordgo.SnowflakeTimestamp(id_message)
@@ -33,7 +33,7 @@ var (
 				},
 			})
 		},
-		"text": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		"chat": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 			options := i.ApplicationCommandData().Options
 
@@ -63,15 +63,60 @@ var (
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: `Got it! You sent: "` + message + `" ` + storyCleared + "Wait for answer...", 
+					Content: `Got it! You sent: "` + message + `" ` + storyCleared + "Wait for answer...",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.Button{
+									Label:    "Сlear history",
+									Style:    discordgo.SecondaryButton,
+									Disabled: false,
+									CustomID: "ClearChatHistoryButton",
+								},
+							},
+						},
+					},
 				},
 			})
 
-			go gpt.SendToGPTForAnswer(&message, s, i, NumOfCallText)
+			go gpt.Chat20Requests(&message, s, i, NumOfCallText)
 
 			if NumOfCallText == 19 {
 				NumOfCallText = 0
 			}
+		},
+		"translate": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+			options := i.ApplicationCommandData().Options
+
+			optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+			for _, opt := range options {
+				optionMap[opt.Name] = opt
+			}
+
+			margs := make([]interface{}, 0, len(options))
+			msgformat := ""
+
+			if option, ok := optionMap["message"]; ok {
+
+				margs = append(margs, option.StringValue())
+				msgformat += "%s"
+			}
+
+			message := fmt.Sprintf(
+				msgformat,
+				margs...,
+			)
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: `Got it! You sent: "` + message + `" ` + "Wait for translation and grammar correction...",
+				},
+			})
+
+			go gpt.SendToTranslateWithGrammarCorrection(&message, s, i)
+
 		},
 		"image": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
@@ -82,5 +127,5 @@ var (
 				},
 			})
 		},
-    }
+	}
 )
