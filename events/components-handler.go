@@ -13,7 +13,7 @@ var (
 
 				NumOfCallText = 0
 
-				gpt.DeletingChatMessages()
+				go gpt.DeletingChatMessages()
 	
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
