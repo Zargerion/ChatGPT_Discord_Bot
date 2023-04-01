@@ -9,15 +9,15 @@ import (
 
 var (
 	defaultPermission bool = true
-	commands = []*discordgo.ApplicationCommand {
+	commands               = []*discordgo.ApplicationCommand{
 		{
-			Name: "ping",
-			Description: "Checks working.",
+			Name:              "ping",
+			Description:       "Checks working.",
 			DefaultPermission: &defaultPermission,
 		},
 		{
-			Name: "chat",
-			Description: "To write and get text answer.",
+			Name:              "chat",
+			Description:       "To write and get text answer.",
 			DefaultPermission: &defaultPermission,
 			Options: []*discordgo.ApplicationCommandOption{
 
@@ -30,8 +30,8 @@ var (
 			},
 		},
 		{
-			Name: "translate",
-			Description: "To write and get text that translated to english.",
+			Name:              "translate",
+			Description:       "To write and get text that translated to english.",
 			DefaultPermission: &defaultPermission,
 			Options: []*discordgo.ApplicationCommandOption{
 
@@ -42,13 +42,27 @@ var (
 					Required:    true,
 				},
 			},
-		},	
+		},
 		{
-			Name: "image",
-			Description: "To write text but get text with image. *Can be unavalable.",
+			Name:              "image",
+			Description:       "To write text but get text with image. *Can be unavalable.",
 			DefaultPermission: &defaultPermission,
 		},
-    }
+		{
+			Name:              "dan",
+			Description:       "Addon for DAN.",
+			DefaultPermission: &defaultPermission,
+			Options: []*discordgo.ApplicationCommandOption{
+
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "message",
+					Description: "Text massage.",
+					Required:    true,
+				},
+			},
+		},
+	}
 	registeredCommands []*discordgo.ApplicationCommand
 )
 
@@ -64,13 +78,13 @@ func InitComandList(s *discordgo.Session) {
 	}
 }
 
-func DeleteComandList(s *discordgo.Session)  {
+func DeleteComandList(s *discordgo.Session) {
 	fmt.Println("Deleting commands...")
 	for _, v := range registeredCommands {
 		err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
 		if err != nil {
 			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
 		}
-		
+
 	}
 }

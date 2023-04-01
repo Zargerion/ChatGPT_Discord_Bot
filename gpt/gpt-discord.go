@@ -9,13 +9,12 @@ import (
 )
 
 var (
-	api_key string
+	api_key     string
 	clearSignal bool = false
-	chat_gpt interfaceGPT.IGPT
-	plus_line string = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-
+	chat_gpt    interfaceGPT.IGPT
+	plus_line   string = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 )
-	
+
 func init() {
 	viper.SetConfigFile(".env")
 	viper.ReadInConfig()
@@ -27,11 +26,10 @@ func init() {
 			fmt.Println("Missing api key for discord.")
 			return
 		}
-		api_key = viper.GetString("GPT_API_KEY")	
+		api_key = viper.GetString("GPT_API_KEY")
 	}
 	chat_gpt = interfaceGPT.NewGPT(api_key)
 }
-
 
 func Chat20Requests(msg *string, s *discordgo.Session, i *discordgo.InteractionCreate, NumOfCallText int8) {
 
@@ -46,11 +44,9 @@ func Chat20Requests(msg *string, s *discordgo.Session, i *discordgo.InteractionC
 		ans = "Error: Cannot send/get message."
 	} else {
 		fmt.Println((plus_line + "\n\n" + ans + "\n\n" + plus_line + "\n@" + i.Member.User.Username))
-		s.ChannelMessageSend(i.ChannelID, (plus_line + "\n\n" + ans + "\n\n" + plus_line + "\n<@" + i.Member.User.ID + ">")) 
+		s.ChannelMessageSend(i.ChannelID, (plus_line + "\n\n" + ans + "\n\n" + plus_line + "\n<@" + i.Member.User.ID + ">"))
 	}
 }
-
-
 
 func SendToTranslateWithGrammarCorrection(msg *string, s *discordgo.Session, i *discordgo.InteractionCreate) {
 
@@ -71,7 +67,17 @@ func SendToTranslateWithGrammarCorrection(msg *string, s *discordgo.Session, i *
 		ans = "Error: Cannot send/get message for grammar correction."
 	} else {
 		fmt.Println(("Grammar corrected:\n" + plus_line + ans + "\n\n" + plus_line + "\n@" + i.Member.User.Username))
-		s.ChannelMessageSend(i.ChannelID, (plus_line + ans + "\n\n" + plus_line + "\n<@" + i.Member.User.ID + ">")) 
+		s.ChannelMessageSend(i.ChannelID, (plus_line + ans + "\n\n" + plus_line + "\n<@" + i.Member.User.ID + ">"))
+	}
+}
+func SendToDAN(msg *string, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	ans, err := chat_gpt.ToGPTWithDENCorrect(*msg)
+	if err != nil {
+		fmt.Println("Error: Cannot send/get message for DAN.")
+		ans = "Error: Cannot send/get message for DAN."
+	} else {
+		fmt.Println(("DAN massage:\n" + plus_line + ans + "\n\n" + plus_line + "\n@" + i.Member.User.Username))
+		s.ChannelMessageSend(i.ChannelID, (plus_line + ans + "\n\n" + plus_line + "\n<@" + i.Member.User.ID + ">"))
 	}
 }
 

@@ -127,5 +127,38 @@ var (
 				},
 			})
 		},
+		"dan": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+			options := i.ApplicationCommandData().Options
+
+			optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+			for _, opt := range options {
+				optionMap[opt.Name] = opt
+			}
+
+			margs := make([]interface{}, 0, len(options))
+			msgformat := ""
+
+			if option, ok := optionMap["message"]; ok {
+
+				margs = append(margs, option.StringValue())
+				msgformat += "%s"
+			}
+
+			message := fmt.Sprintf(
+				msgformat,
+				margs...,
+			)
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: `Got it! You sent: "` + message + `" ` + "Wait for DEN...",
+				},
+			})
+
+			go gpt.SendToDAN(&message, s, i)
+
+		},
 	}
 )
